@@ -419,8 +419,9 @@ Content-Type: application/json
 
 ## Usage Examples
 
-### cURL Example
+### cURL Examples
 
+#### Registration Example
 ```bash
 curl -X POST http://localhost:3000/api/captains/register \
   -H "Content-Type: application/json" \
@@ -441,8 +442,33 @@ curl -X POST http://localhost:3000/api/captains/register \
   }'
 ```
 
-### JavaScript/Fetch Example
+#### Login Example
+```bash
+curl -X POST http://localhost:3000/api/captains/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "password": "securepassword123"
+  }'
+```
 
+#### Get Profile Example
+```bash
+curl -X GET http://localhost:3000/api/captains/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+#### Logout Example
+```bash
+curl -X GET http://localhost:3000/api/captains/logout \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+### JavaScript/Fetch Examples
+
+#### Registration Example
 ```javascript
 const registerCaptain = async (captainData) => {
   try {
@@ -489,6 +515,113 @@ registerCaptain(captainData)
   .catch(error => console.error('Registration failed:', error));
 ```
 
+#### Login Example
+```javascript
+const loginCaptain = async (credentials) => {
+  try {
+    const response = await fetch('http://localhost:3000/api/captains/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+// Usage
+const credentials = {
+  email: "john.doe@example.com",
+  password: "securepassword123"
+};
+
+loginCaptain(credentials)
+  .then(result => {
+    console.log('Login successful:', result);
+    // Store token for future requests
+    localStorage.setItem('token', result.token);
+  })
+  .catch(error => console.error('Login failed:', error));
+```
+
+#### Get Profile Example
+```javascript
+const getCaptainProfile = async (token) => {
+  try {
+    const response = await fetch('http://localhost:3000/api/captains/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to get profile');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Profile error:', error);
+    throw error;
+  }
+};
+
+// Usage
+const token = localStorage.getItem('token');
+getCaptainProfile(token)
+  .then(result => console.log('Profile:', result.captain))
+  .catch(error => console.error('Failed to get profile:', error));
+```
+
+#### Logout Example
+```javascript
+const logoutCaptain = async (token) => {
+  try {
+    const response = await fetch('http://localhost:3000/api/captains/logout', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Logout failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+};
+
+// Usage
+const token = localStorage.getItem('token');
+logoutCaptain(token)
+  .then(result => {
+    console.log('Logout successful:', result.message);
+    localStorage.removeItem('token'); // Clear stored token
+  })
+  .catch(error => console.error('Logout failed:', error));
+```
+
 ---
 
 ## Notes
@@ -502,14 +635,220 @@ registerCaptain(captainData)
 
 ---
 
-## Future Endpoints (To be implemented)
+### 2. Login Captain
 
-- `POST /login` - Captain authentication
-- `GET /profile` - Get captain profile
-- `PUT /profile` - Update captain profile
-- `PUT /location` - Update captain location
-- `PUT /status` - Update captain status (online/offline)
-- `DELETE /logout` - Logout captain 
+**POST** `/login`
+
+Authenticate a captain and receive an access token.
+
+#### Request Headers
+```
+Content-Type: application/json
+```
+
+#### Request Body
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123"
+}
+```
+
+#### Field Validation Rules
+
+| Field | Type | Required | Validation Rules |
+|-------|------|----------|------------------|
+| `email` | String | Yes | Valid email format |
+| `password` | String | Yes | Min 6 characters |
+
+#### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "phone": "+1234567890",
+    "email": "john.doe@example.com",
+    "socketId": null,
+    "status": "offline",
+    "vehicle": {
+      "color": "Blue",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "location": {
+      "lat": null,
+      "lng": null
+    }
+  }
+}
+```
+
+#### Error Responses
+
+**Status Code:** `400 Bad Request`
+
+**Invalid Credentials:**
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+**Validation Errors:**
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "value": "invalid-email",
+      "msg": "Invalid Email",
+      "path": "email",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "value": "123",
+      "msg": "Password must be at least 6 characters long",
+      "path": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+### 3. Get Captain Profile
+
+**GET** `/profile`
+
+Get the authenticated captain's profile information. Requires authentication token.
+
+#### Headers
+```
+Authorization: Bearer <jwt_token>
+```
+OR
+```
+Cookie: token=<jwt_token>
+```
+
+#### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "captain": {
+    "_id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "phone": "+1234567890",
+    "email": "john.doe@example.com",
+    "socketId": null,
+    "status": "offline",
+    "vehicle": {
+      "color": "Blue",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "location": {
+      "lat": null,
+      "lng": null
+    },
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+#### Error Response
+
+**Status Code:** `401 Unauthorized`
+```json
+{
+  "errors": [
+    { 
+      "msg": "Unauthorized"
+    }
+  ]
+}
+```
+
+### 4. Logout Captain
+
+**GET** `/logout`
+
+Logout the currently authenticated captain and invalidate the token.
+
+#### Headers
+```
+Authorization: Bearer <jwt_token>
+```
+OR
+```
+Cookie: token=<jwt_token>
+```
+
+#### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### Error Response
+
+**Status Code:** `401 Unauthorized`
+```json
+{
+  "errors": [
+    {
+      "msg": "Unauthorized"
+    }
+  ]
+}
+```
+
+---
+
+## Authentication Details
+
+### JWT Token Usage
+- Tokens are generated upon successful login/registration
+- Token expiration: 24 hours
+- Tokens can be sent via:
+  - `Authorization: Bearer <token>` header
+  - `Cookie: token=<token>` cookie
+
+### Token Blacklisting
+- Logout functionality blacklists tokens
+- Blacklisted tokens cannot be used for authentication
+- Provides secure session termination
+
+---
+
+## Complete Endpoint Summary
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| POST | `/register` | Register new captain | ❌ None |
+| POST | `/login` | Captain authentication | ❌ None |
+| GET | `/profile` | Get captain profile | ✅ Required |
+| GET | `/logout` | Logout captain | ✅ Required | 
 
 
 
