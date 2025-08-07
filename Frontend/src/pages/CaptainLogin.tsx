@@ -29,7 +29,7 @@ function CaptainLogin() {
           alt=""
         />
         <form className="flex flex-col justify-center pt-10 px-2 mt-2">
-          <h3 className="text-2xl font-semibold mb-1 ">What's your Email?</h3>
+          <h3 className="text-base font-semibold mb-1 ">What's your email Captain?</h3>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -38,7 +38,7 @@ function CaptainLogin() {
             type="email"
             placeholder="email@example.com"
           />
-          <h3 className="text-2xl font-semibold mb-1">Enter Password</h3>
+          <h3 className="text-base font-semibold mb-1">Enter Password</h3>
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}

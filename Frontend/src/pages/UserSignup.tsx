@@ -16,8 +16,10 @@ function UserSignup() {
       setError("Please fill in all fields");
     }else{
     setUserData({
-      "firstname": firstname,
-      "lastname": lastname,
+      "fullname": {
+        "firstname": firstname,
+        "lastname": lastname,
+      },
       "email": email,
       "password": password,
     });
@@ -37,7 +39,7 @@ function UserSignup() {
           alt=""
         />
         <form className="flex flex-col justify-center pt-10 px-2">
-          <h3 className="text-base font-semibold mb-1 ">What's your Name</h3>
+          <h3 className="text-base font-semibold mb-1 ">What's your Name?</h3>
           <div className="flex gap-4 mb-7 ">
             <input
               value={firstname}
@@ -55,7 +57,7 @@ function UserSignup() {
               placeholder="Doe"
             />
           </div>
-          <h3 className="text-base font-semibold mb-1 ">What's your Email</h3>
+          <h3 className="text-base font-semibold mb-1 ">What's your Email?</h3>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}

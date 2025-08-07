@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router";
+import { UserDataContext } from "../context/UserDataContext";
 
 function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [userData, setUserData] = useState({});
-
+  const ans = useContext(UserDataContext);
+  console.log(ans);
   const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!email || !password) {
@@ -30,7 +32,7 @@ function UserLogin() {
           alt=""
         />
         <form className="flex flex-col justify-center pt-10 px-2">
-          <h3 className="text-2xl font-semibold mb-1 ">What's your Email?</h3>
+          <h3 className="text-base font-semibold mb-1 ">What's your Email?</h3>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -39,7 +41,7 @@ function UserLogin() {
             type="email"
             placeholder="email@example.com"
           />
-          <h3 className="text-2xl font-semibold mb-1">Enter Password</h3>
+          <h3 className="text-base font-semibold mb-1">Enter Password</h3>
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
